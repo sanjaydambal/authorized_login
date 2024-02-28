@@ -86,4 +86,16 @@ export const create = (data, callback) => {
             }
         );
     }
-    
+export const getUsersByEmail = (email, callback) => {
+    pool.query(
+        `SELECT * FROM registration WHERE email =?`,
+        [email],
+        (error, result) => {
+            if (error) {
+                callback(error);
+            } else {
+                callback(null, result[0]);
+            }
+        }
+    );
+}

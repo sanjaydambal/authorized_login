@@ -1,5 +1,7 @@
-import { create,getUsers,getUserById,updateUser,deleteUser } from './users.service.js'; 
-import { genSaltSync, hashSync } from 'bcrypt';
+import { create,getUsers,getUserById,updateUser,deleteUser,getUsersByEmail } from './users.service.js'; 
+import { genSaltSync, hashSync,compare } from 'bcrypt';
+import pkg from 'jsonwebtoken';
+const { sign } = pkg;
 
 // Your createUser function
 export const createUser = (req, res) => {
@@ -98,6 +100,47 @@ export const deleteUsers = (req, res) => {
                 message: 'User deleted successfully',
                 data: result
             });
+        }
+    });
+}
+
+export const login = (req, res) => {
+    const body = req.body;
+    
+    getUsersByEmail(body.email, (err, results) => {
+        if (err) {
+            res.status(400).json({
+                status: 'error',
+                message: err
+            });
+        } else if (!results || results.length === 0) { // Fixed typo result -> results
+            res.status(404).json({
+                status: 'error',
+                message: 'invalid email or password'
+            });
+        } else { // Moved this else block to handle the next steps
+            const result = compare(body.password, results.password);
+            if(result) {
+                results.password = undefined;
+                
+                const token = sign({
+                    result: results
+                }, process.env.JWT_SECRET, {
+                    expiresIn: '24h'
+                });
+                res.status(200).json({
+                    status:'success',
+                    message: 'User logged in successfully',
+                    data: {
+                        token
+                    }
+                })
+            } else {
+                res.status(404).json({
+                    status: 'error',
+                    message: 'invalid email or password'
+                });
+            }
         }
     });
 }
