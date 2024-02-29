@@ -2,13 +2,14 @@ import {createUser,getUsersList,getUsersById,updateUsers,deleteUsers,login} from
 import express from 'express';
 
 const router = express.Router();
+import {verifyToken} from '../auth/token_validation.js';
 
 
-router.post('/', createUser);
-router.get('/', getUsersList);
-router.get('/:id', getUsersById);
-router.patch('/:id', updateUsers);
-router.delete('/:id', deleteUsers);
+router.post('/',verifyToken, createUser);
+router.get('/',verifyToken, getUsersList);
+router.get('/:id',verifyToken, getUsersById);
+router.patch('/:id',verifyToken, updateUsers);
+router.delete('/:id',verifyToken, deleteUsers);
 router.post('/login', login);
 
 export { router };
