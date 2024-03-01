@@ -144,3 +144,9 @@ export const login = (req, res) => {
         }
     });
 }
+export const logout = (req, res) => {
+    res.status(200).json({
+        status:'success',
+        message: 'User logged out successfully'
+    })
+}
